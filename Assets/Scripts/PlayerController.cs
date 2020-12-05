@@ -6,29 +6,52 @@ public class PlayerController : MonoBehaviour
 {
     [SerializeField] private LineRenderer line;
     [SerializeField] private Transform target;
+
+    [SerializeField] private GameObject bullet; 
+
+    [SerializeField] private float ballVolume = 5f;
+
+
+
     void Start()
     {
-        //line = GetComponent<LineRenderer>();
-        var diameter = gameObject.GetComponent<SphereCollider>().radius * 2;
-        SetLinePosition(diameter);
+        SetLinePosition(target.position);
     }
 
-    // Update is called once per frame
     void Update()
     {
-        transform.position = new Vector3(transform.position.x, transform.position.y - transform.localScale.y / 2, transform.position.z);
+
+        SetTransform();
+        if (Input.GetMouseButtonDown(0))
+        {
+            FireBall();
+        }
     }
 
-    private void SetLinePosition(float diameter)
+    private void FireBall()
+    {
+        var bull = Instantiate(bullet, transform.position, Quaternion.identity);
+        bull.transform.LookAt(target);
+        bull.GetComponent<Rigidbody>().velocity = bull.transform.forward * 10f;
+    }
+
+    private void SetTransform()
+    {
+        var radius = ballVolume / 2;
+        var bottomPos = new Vector3(transform.localPosition.x, transform.localPosition.y - radius, transform.localPosition.z);
+
+        transform.localScale = new Vector3(ballVolume, ballVolume, ballVolume);
+        transform.position = new Vector3(bottomPos.x, 0 + transform.position.y - bottomPos.y, bottomPos.z);
+    }
+
+    private void SetLinePosition(Vector3 targetPos)
     {
         Vector3[] points = new Vector3[] 
         {
-            new Vector3(transform.position.x, 0, transform.position.z),
-            new Vector3(target.position.x, 0, target.position.z)
+            new Vector3(transform.position.x, 0.1f, transform.position.z),
+            new Vector3(targetPos.x, 0.1f, targetPos.z)
         };
             
         line.SetPositions(points);
-
-        line.startWidth = diameter;
     }
 }
